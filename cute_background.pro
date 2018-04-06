@@ -29,12 +29,6 @@
 ; MODIFICATION HISTORY:
 ;      created 01.12.2017 by A. G. Sreejith
 
-;function keyword_defined, key
-;
-;  if n_elements(key) eq 0 then return, 0 else return, 1
-;
-;end
-
 function cute_background, nx=nx, ny=ny, token=token, ra=ra, dec=dec, jd=jd, file_bg=file_bg, file_sol=file_sol, file_zod=file_zod, wavelength=wavelength
 
 if not keyword_defined(nx       ) then nx        = 2048
@@ -92,12 +86,12 @@ background=dblarr(nx)
     length=file_lines(file_zods)
     data_zod=dblarr(2,length)
     openr,1,file_zods
-    readf,1,data_zods
+    readf,1,data_zod
     close,1
 
-    zod_spectrum=zod_value*data_zods[1,*]
+    zod_spectrum=zod_value*data_zod[1,*]
 
-    background=interpol(zod_spectrum,data_zods[0,*],wavelength,/SPLINE)
+    background=interpol(zod_spectrum,data_zod[0,*],wavelength,/SPLINE)
     ; to photons/s/cm2/pixel (use: 1 steradian = 1 rad2 = 3282.8 deg2 = 4.25 x 10^10 arcsec2, where 4p steradians = sphere.)
     background=background*25/4.25e10
   endif else begin

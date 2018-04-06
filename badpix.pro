@@ -4,7 +4,7 @@
 ; PURPOSE:
 ;      Returns the 2d image array after putting in bad and hot pixels including bad/hot coloums/rows
 ; CALLING SEQUENCE:
-;      Result = COSMIC(file)
+;      Result = badpix(file)
 ;
 ; INPUTS:
 ;      file = Parameter file for bad/hot pixel positions.

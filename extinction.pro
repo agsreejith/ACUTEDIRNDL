@@ -1,13 +1,12 @@
 
-
-function extinction,glon,glat,distance
+pro extinction,glong,glat,distance,av,ebv
 ;Interstellar Extinction in the Galaxy (Amores & L�pine - 2004)
 ;This program corresponds to the Axysimetric Model (Model A)
 ;If you have any difficulty, sugestion or comments, please contact:
 ;jacques@astro.iag.usp.br     or     amores@astro.iag.usp.br
 ;You enter longitude, latitude and distance of a point in the Galaxy and get extinction
 
-
+close,/all
 r0=7.5 ;adopted distance of the Galactic center
 conv=!pi/180.
 
@@ -21,7 +20,8 @@ step  = 0.05     ;steps of the gas density integration to obtain column density,
 ;read,glong,glat,PROMPT='Give the galactic longitude and latitude (Degrees,Degrees)....:  '
 ;read,dist,PROMPT='Distance [kpc](positive value)...�
 
-nstep=fix(dist/step)
+dist=distance
+nstep=long64(dist/step)
 
 if nstep eq 0 then nstep = 1
 
@@ -83,7 +83,6 @@ gam2=2.0
 
 tune=1.
 if glong ge 120 and glong le 200 then tune=2.
-
 agas=gam1*(ah1*zmet*exp(-0.5*((z-zc)/zH)^2))+gam2*aco*exp(-0.5*((z-zc)/zCO)^2)
 
 av=total(agas)*step*3.086*.57*tune
@@ -98,9 +97,9 @@ ebv = av/rs
 print,'E(B-V)= ',ebv,' mag; Av= ', av, 'mag'
 
 floating_point_underflow = 32
-status = Check_Math()         ; Get status and reset accumulated math error register.
-IF(status AND NOT floating_point_underflow) NE 0 THEN $
-  Message, 'IDL Check_Math() error: ' + StrTrim(status, 2)
+;status = Check_Math()         ; Get status and reset accumulated math error register.
+;IF(status AND NOT floating_point_underflow) NE 0 THEN $
+;  Message, 'IDL Check_Math() error: ' + StrTrim(status, 2)
 
-
+return
 end
