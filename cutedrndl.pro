@@ -472,7 +472,7 @@ if (tag_exist(infile,'transit_mid_time') eq 1)then Tmid=double(mid_time)
 
 writecol,file_out+'input_light curve.txt',new_time,scale
 t0=t
-for k=18, 19 do begin ;n_elements(scale[0,*])-1
+for k=0, n_elements(scale[0,*])-1 do begin ;n_elements(scale[0,*])-1
 ;  inc=k*exptime/86400.0
 ;  t=t0+inc
   if (tag_exist(infile,'transit_mid_time') eq 1)then t=new_time[k] 
