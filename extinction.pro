@@ -13,7 +13,7 @@ conv=!pi/180.
 step  = 0.05     ;steps of the gas density integration to obtain column density, in pc
 ;glong=100.0        ;galactic longitude; an arbitrary value given here
 ;glat=0.0            ;galactic latitude
-;dist = 20.0       ;distance of the point to which we will calculate the extinction
+;dist = 20.0       ;distance of the point to which we will calculate the extinction in kpc
 
 ;print,'Interstellar Extinction in the Galaxy (Amores & L�pine - 2005, AJ, 130, 679)'
 ;

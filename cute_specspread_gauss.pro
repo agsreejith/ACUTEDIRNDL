@@ -27,7 +27,7 @@
 ;       added xdispersion based on actual values from Zemax model. 
 ;      
 
-function cute_specspread, file_pos, file_spread, ccd_count, nx, ny,s_pos, x_shift,y_shift,scale
+function cute_specspread_gauss, file_pos, file_spread, ccd_count, nx, ny,s_pos, x_shift,y_shift,scale
 close,/all
 if not keyword_defined(file_pos    ) then file_pos    = 'extra\position.txt'
 if not keyword_defined(file_spread ) then file_spread = 'extra\cuteback.txt'
@@ -78,14 +78,16 @@ im=make_array(nx,ny, /DOUBLE, value=0.0)
 for x=0L,nx-1 do begin
   y=slope*x+intercept+y_shift
   y=fix(y)
-; guassian spread: use when necessary 
-; im[x,y+start]=ccd_count(x)
-; npix=fix(x_spread[x])
-; width=fix(xrms[x])
-; xspread=psf_Gaussian( NPIXEL=npix, FWHM=width , /DOUBLE, /NORMALIZE);spread in cross dispesion direction guassian
-; for j=0,npix-1 do begin
-;   im[x,(y+start+j-(npix/2))]=xspread[j]*ccd_count(x)
-; endfor
+ ;guassian spread: use when necessary 
+ im[x,y+start]=ccd_count(x)
+ npix=11;fix(x_spread[x])
+ width=6;fix(xrms[x])
+ xsp=gaussian([-5,-4,-3,-2,-1,0,1,2,3,4,5],[1,0,3])
+ xspread=xsp/total(xsp)
+ ;xspread=psf_Gaussian( NPIXEL=npix, FWHM=width , /DOUBLE, /NORMALIZE);spread in cross dispesion direction guassian
+ for j=0,npix-1 do begin
+   im[x,(y+start+j-fix((npix/2)))]=xspread[j]*ccd_count(x)
+ endfor
 
 ; Zemax value spread 
   ;disp_file='extra\xdisp_inter.txt'
@@ -99,27 +101,27 @@ for x=0L,nx-1 do begin
   readf,1,x_spread
   close,1
 
-; The spectrum is divided into 11 wavelength segments with varying cross-dispersion spread 
-  if x le 180 then spread = x_spread[1,*]
-  if x ge 180 and x le 360 then spread   = x_spread[2,*]
-  if x ge 360 and x le 540 then spread   = x_spread[3,*]
-  if x ge 540 and x le 720 then spread   = x_spread[4,*]
-  if x ge 720 and x le 900 then spread   = x_spread[5,*]
-  if x ge 900 and x le 1080 then spread  = x_spread[6,*]
-  if x ge 1080 and x le 1260 then spread = x_spread[7,*]
-  if x ge 1260 and x le 1440 then spread = x_spread[8,*]
-  if x ge 1440 and x le 1620 then spread = x_spread[9,*]
-  if x ge 1620 and x le 1800 then spread = x_spread[10,*]
-  if x ge 1800 then spread               = x_spread[11,*]
-
-  for j=0,len-1 do begin
-    out=spread[j]*ccd_count(x)
-    ;spread_value=out
-    spread_value=out
-    if ((y+start+x_spread[0,j]) lt ny-1 and (y+start+x_spread[0,j]) gt 0) then im[x,(y+start+x_spread[0,j])]=spread_value
-  endfor
+;; The spectrum is divided into 11 wavelength segments with varying cross-dispersion spread 
+;  if x le 180 then spread = x_spread[1,*]
+;  if x ge 180 and x le 360 then spread   = x_spread[2,*]
+;  if x ge 360 and x le 540 then spread   = x_spread[3,*]
+;  if x ge 540 and x le 720 then spread   = x_spread[4,*]
+;  if x ge 720 and x le 900 then spread   = x_spread[5,*]
+;  if x ge 900 and x le 1080 then spread  = x_spread[6,*]
+;  if x ge 1080 and x le 1260 then spread = x_spread[7,*]
+;  if x ge 1260 and x le 1440 then spread = x_spread[8,*]
+;  if x ge 1440 and x le 1620 then spread = x_spread[9,*]
+;  if x ge 1620 and x le 1800 then spread = x_spread[10,*]
+;  if x ge 1800 then spread               = x_spread[11,*]
+;
+;  for j=0,len-1 do begin
+;    out=spread[j]*ccd_count(x)
+;    ;spread_value=out
+;    spread_value=out
+;    if ((y+start+x_spread[0,j]) lt ny-1 and (y+start+x_spread[0,j]) gt 0) then im[x,(y+start+x_spread[0,j])]=spread_value
+;  endfor
 
 endfor
-;stop
+
 return,im
 end

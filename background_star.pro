@@ -99,7 +99,7 @@ openr,1,file_wave
 readf,1,wavelength
 close,1
 
-if (tag_exist(infile,'bckg_star') eq 0)then begin
+if (tag_exist(infile,'background_star') eq 0)then begin
   ;get catalogue from VIZIER
   data=QUERYVIZIER('I/305/out',[ra,dec],12,/ALLCOLUMNS)
   tags = Get_Tags(data)
@@ -114,7 +114,7 @@ if (tag_exist(infile,'bckg_star') eq 0)then begin
   nmag=data.nmag
 
   endif else begin
-    bckg_str_file=infile.bckg_str
+    bckg_str_file=infile.background_star
     length=file_lines(bckg_str_file)
     bs_data=dblarr(5,length)
     openr,1,bckg_str_file
@@ -175,6 +175,7 @@ for j=0, n_elements(s_ra)-1 do begin
         loc = VALUE_LOCATE(BV,s_bv)
         s_temp = Teff[loc]
         s_rad = R[loc]  ;stellar radi wrt sun
+        if s_bv lt 0 then goto,skip
       endif else begin
         if ((finite(bmag[j],/NaN) eq 0) or (finite(nmag[j],/NaN)) eq 0)then begin
          ;print,bmag[j],nmag[j] 
@@ -197,7 +198,7 @@ for j=0, n_elements(s_ra)-1 do begin
         ;add stuff for Line core emission values
         ;print,s_ra[j],s_dec[j],v_mag,star_pos_y*3600,s_rad,s_temp
         
-          in_structure={input_file:in_file,stellar_magnitude:v_mag,stellar_radius:s_rad,stellar_temperature:s_temp,Ra:s_ra[j], $
+          in_structure={input_file:in_file,stellar_magnitude:v_mag,stellar_radius:s_rad,stellar_temperature:s_temp,Ra:s_ra[j], $ ;creating background star structure
           Dec:s_dec[j],JD:jd,stype:Sp[loc],stellar_params:infile.stellar_params,logr:-4.9}
           if  (tag_exist(infile,'mg_col') eq 1)then struct_add_field,in_structures, mg_col,infile.mg_col  
             wave=wavelength
@@ -221,7 +222,7 @@ for j=0, n_elements(s_ra)-1 do begin
             if (s_pos lt -2 && s_pos ge -8) then fwhm=fwhm*3/2
             if s_pos lt -8 then fwhm=fwhm*2 
             st=value_locate(bs_wave, 2000)
-            en=value_locate(bs_wave, 3500)
+            en=value_locate(bs_wave, 7000)
             bs_wave_new=bs_wave[st:en]
             bs_photons_star_new=bs_photons_star[st:en]
             hwhm=fwhm/2
@@ -269,7 +270,7 @@ for j=0, n_elements(s_ra)-1 do begin
               ccd_wave=wave
             endif
             length=file_lines(file_eff)
-            eff_area=dblarr(11,length)
+            eff_area=dblarr(5,length)
             openr,1,file_eff
             readf,1,eff_area
             close,1
@@ -287,7 +288,7 @@ for j=0, n_elements(s_ra)-1 do begin
 endfor
 writecol,file_out+'background_star.txt',s_ra,s_dec,vmag
 cute_field,ra,dec,s_ra,s_dec,theta,file_out,s_pos,vmag,M_star,s_wid,s_len
-;jitter is implimented in main code
+;jitter now implimented in main code
 ;delta_x=jitter_val
 ;delta_y=jitter_val
 ;delta_z=jitter_val
@@ -296,7 +297,6 @@ cute_field,ra,dec,s_ra,s_dec,theta,file_out,s_pos,vmag,M_star,s_wid,s_len
 ;if infile.jitter_sim eq 1 then im_jstr=jitter(im_str,delta_x,delta_y,delta_z,exptime) else im_jstr= im_str*exptime 
 ;t4=systime(/SECONDS)
 ;print,'jitter2',t4-t3
-
 ;return the background for 1 second exposure
 
 return,im_str

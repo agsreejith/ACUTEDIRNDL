@@ -52,10 +52,24 @@ ccd_wave=dblarr(w_length)
 openr,1,file_wave
 readf,1,wavelength
 close,1
-ccd_wave=wavelength
+
 ;file_eff='extra\eff_area.txt'
+
+
+;if (tag_exist(infile,'developer_mode') eq 1) then begin
+;  start_wave=double(infile.start_wave)
+;  end_wave=double(infile.end_wave)
+;  range=end_wave-start_wave
+;  if (tag_exist(infile,'spectral_resolution') eq 1) then fwhm=float(infile.spectral_resolution)
+;  n_ele=range/(fwhm/2.)
+;  wave_size=long(n_ele)
+;  wavelength=make_array(DIMENSION=wave_size, INCREMENT=fwhm/2, /INDEX, /NOZERO, START=start_wave)
+;  nx=wave_size
+;endif
+
+ccd_wave=wavelength
 length=file_lines(file_eff)
-eff_area=dblarr(11,length)
+eff_area=dblarr(5,length)
 openr,1,file_eff
 readf,1,eff_area
 close,1

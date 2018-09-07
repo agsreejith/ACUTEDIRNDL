@@ -53,7 +53,8 @@ nq_dec=s_dec(req2)
 ;clr = Byte(Round(cgScaleVector(clr, 0, 255)))
 ;cgLoadCT, 33
 ;cgWindow
-cgDisplay, 1000,1000
+cgDisplay, 1400,1400
+;!p.position=[0.15,0.15,0.99,0.99]
 m=max(v_mag)
 mi=min(v_mag)
 range=m-mi
@@ -67,9 +68,9 @@ theta = 2*!pi * findgen(21)/20
 usersym, 1*cos(theta), 1*sin(theta) $
   , fill=0, thick=0
   
-cgplot, n_ra, n_dec,background=cgColor('white'),yrange=[dec-0.2,dec+0.2],xrange=[ra+0.2,ra-0.2],color=cgcolor('black'),xtitle='Right Ascension', $
-  ytitle='Declination',title='Ra:'+String(ra, format='(F9.5)')+', Dec:'+String(dec, format='(F9.5)')+', Pos angle:'+String(rot_ang, format='(F5.1)')+',Slit pos:'+String(pos, format='(F3.1)'),$
-  psym=3,symsize=1,charsize=2,charthick=1.5
+cgplot, n_ra, n_dec,background=cgColor('white'),yrange=[dec-0.20000001,dec+0.1999999],xrange=[ra+0.199999,ra-0.2000001],color=cgcolor('black'),xtitle='right ascension [degree]', $
+  ytitle='declination [degree]',title='Ra:'+String(ra, format='(F9.5)')+', Dec:'+String(dec, format='(F9.5)')+', Pos angle:'+String(rot_ang, format='(F5.1)')+', Slit pos:'+String(pos, format='(F3.1)'),$
+  psym=3,symsize=1,charsize=3,charthick=2.5
   size_val=20/double(M_star)
   cgoplot,ra,dec,psym=16,color=cgColor('medium grey'),symsize=size_val
 for i=0, n_elements(n_dec)-1 do begin
@@ -88,10 +89,10 @@ usersym, 1.0*cos(theta), 1.0*sin(theta) $
 
 cgoplot, n_ra, n_dec,psym=3,symsize=1
 cgPolygon,py,px,color=cgColor('blue')
-cgArrow, 880, 150, 880, 200, /Solid;,/DATA
-cgArrow, 880, 150, 830, 150, /Solid;,/DATA
-cgText,880, 205,'N',CHARSIZE=1.5,ALIGNMENT=0.5,/DEVICE 
-cgText,825, 145,'E',CHARSIZE=1.5,ALIGNMENT=0.5,/DEVICE
+cgArrow, ra-0.19, dec-0.19, ra-0.14,dec-0.19, /Solid,/DATA
+cgArrow, ra-0.19, dec-0.19, ra-0.19, dec-0.14, /Solid,/DATA
+cgText,ra-0.19, dec-0.135,'N',CHARSIZE=1.5,ALIGNMENT=0.5,/DATA
+cgText,ra-0.135, dec-0.19,'E',CHARSIZE=1.5,ALIGNMENT=0.5,/DATA
 ;xyouts,100,50,'N',CHARSIZE=10
 dia=string(M_star)
 ;dia2=string(20)

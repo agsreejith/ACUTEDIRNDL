@@ -1,3 +1,4 @@
+
 pro linearity,value,y
 
 limit=60000
@@ -17,7 +18,7 @@ if value gt 60000 then begin
   if value gt 72000 then y = 72000
   x=value/60000
   y=p1*x^3 + p2*x^2 + p3*x + p4
-  y=y+60000
+  y=y*60000
 endif else begin
   y=value
 endelse

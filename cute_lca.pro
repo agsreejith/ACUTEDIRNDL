@@ -56,7 +56,7 @@ BV_book = [1.48,1.42,1.31,1.15,1.03,0.966,0.912,0.866,0.819,0.776,0.740,0.713,0.
 
   t=lca_strct.temperature
   FMT = 'A,L,F,F'
-  readcol,'extra\stellar_param.txt',F=FMT,Sp,Teff,BV,Radius
+  readcol,lca_strct.param,F=FMT,Sp,Teff,BV,Radius
   loc = VALUE_LOCATE(Teff,t)
   if (tag_exist(lca_strct,'stype') eq 0  ) then stype  = Sp[loc] else stype = lca_strct.stype  
   if (tag_exist(lca_strct,'bv') eq 0     ) then BV     = interpol(BV_book,T_book,Teff) else BV = lca_strct.bv
