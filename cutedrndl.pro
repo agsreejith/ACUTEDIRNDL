@@ -324,7 +324,7 @@ aeff=interpol(eff_area[4,*],eff_area[0,*],wave_res,/SPLINE); linear interpolatio
 
 ccd_count1=dblarr(nx/2) 
 ;Effective area/QE
-ccd_count1=ccd_flux;*aeff*fwhm ;comment *aeff*fwhm during jitter test
+ccd_count1=ccd_flux*aeff*fwhm ;comment *aeff*fwhm during jitter test
 plot,wave_res,ccd_count1
 writecol,file_out+'cute_counts.txt',wave_res,ccd_count1*300.
 ;write_png,file_out+'cute_count.png',TVRD(/TRUE)
