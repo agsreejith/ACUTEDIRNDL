@@ -55,6 +55,12 @@ type_bckg			= 'calc'
 stars				= 1 
 cosmic				= 5
 #
+#scatter_parameters
+scatter				= 0
+scatter_in			= 1 # input flux over FOV in photons/s/cm2/sr
+scatter_fov			= 100 #fov of the instrument for scatter
+scatter_reduction	= 1e-10#reduction in scatter due to absorption	
+#
 #file location for stellar parameters for different stellar type
 stellar_params		= 'extra\stellar_param.txt'	
 #file locations for background calculation
@@ -91,6 +97,15 @@ jitter_in_z			= 7.2
 rotation			= 115
 jitter_sim			= 1
 #
+#Occultation parameters
+sc_orbit_period 	= 0
+ocl_time			= 0
+#Sytematics parameters
+systematics	= 0
+sym_p1		= 0
+sym_p2		= 0
+sym_p3		= 0
+sym_p4		= 0
 #Transit parameters
 #Orbital period is in days, inclination in degrees, semi major axis as a function of stellar 
 #radius and mid transit time(if not provided calculated from JD) 
@@ -105,3 +120,7 @@ rlt_semi_major_axis	= 8.7947
 #planet radius (ratio of planet radius to stellar radius) with wavelength in CUTE band.	
 planet_radius		= 0.12156
 #planet_radius_file = 'extra\radius.txt'
+#transit= 'lightcurve.txt'
+developer_mode		= 0
+start_wave			= 2500
+#end_wave			= 4000
