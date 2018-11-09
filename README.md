@@ -132,25 +132,23 @@ planetary radius as a function of wavelength (second column). Also in this case,
 function of wavelength has to be set in units of stellar radii. If the file with planetary radius as a 
 functioon of wavelength is specified, then the code takes this instead of the constant radius.
 
-Other parameters
-- Currently the CCD linearity curve is set to the linear up to 60000 counts, after which it follows a 3rd 
-order polynomial till 72000 counts (saturation). 
-- The surface gravity and metallicity of the stars is assumed to be always equal to 4.5 and solar, 
-respectively.	
 	
+3. EXAMPLES OF SOME INPUT FILES
+-------------------------------	
 
-3. DISCLAIMER
+
+4. DISCLAIMER
 -------------
 You may encounter bugs in this software. If you do, please report them. Your bug
 reports are valuable contributions, since they allow us to notice and fix
 problems on machines/platforms we don't have, and/or remained un-noticed.
 
 
-4. REPORTING BUGS
+5. REPORTING BUGS
 -----------------
 Drop in an email to: sreejith.aickara_AT_oeaw.ac.at
 
 please include as many details as possible.
 
 -----------------------------------------------------------
-last modified: modified 07.09.2018 by A. G. Sreejith
+last modified: modified 09.11.2018 by A. G. Sreejith
