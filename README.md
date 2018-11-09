@@ -150,6 +150,7 @@ Example for wavelength depended transit light curve
 10	1	1	1	1	1	1
 
 
+
 Example for input for shape of the footprint as a function of wavelength (first column is the pixels from centroid and other column is spread at different wavelength bins)
 
          -6.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0034 0.0345
