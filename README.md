@@ -136,19 +136,19 @@ functioon of wavelength is specified, then the code takes this instead of the co
 3. EXAMPLES OF SOME INPUT FILES
 -------------------------------	
 Example for wavelength depended transit light curve
-
 0	2000	2010	2020	2030	2040	2050
-0	1		1		1		1		1		1
-1	1		1		1		1		1		1
-2	1		1		1		1		1		1
-3	0.99		0.99	0.99	0.99	0.99	0.99	
-4	0.985		0.98	0.98	0.985	0.984	0.984
-5	0.98		0.97	0.97	0.985	0.98	0.98
-6	0.985		0.98	0.98	0.985	0.984	0.984
-7	0.99		0.99	0.99	0.99	0.99	0.99
-8	1		1		1		1		1		1
-9	1		1		1		1		1		1
-10	1		1		1		1		1		1
+0	1	1	1	1	1	1
+1	1	1	1	1	1	1
+2	1	1	1	1	1	1
+3	0.99	0.99	0.99	0.99	0.99	0.99
+4	0.985	0.98	0.98	0.985	0.984	0.984
+5	0.98	0.97	0.97	0.985	0.98	0.98
+6	0.985	0.98	0.98	0.985	0.984	0.984
+7	0.99	0.99	0.99	0.99	0.99	0.99
+8	1	1	1	1	1	1
+9	1	1	1	1	1	1
+10	1	1	1	1	1	1
+
 
 Example for input for shape of the footprint as a function of wavelength (first column is the pixels from centroid and other column is spread at different wavelength bins)
 
