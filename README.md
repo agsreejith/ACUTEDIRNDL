@@ -138,6 +138,7 @@ functioon of wavelength is specified, then the code takes this instead of the co
 Example for wavelength depended transit light curve
 
 0	2000	2010	2020	2030	2040	2050
+
 0	1	1	1	1	1	1
 
 1	1	1	1	1	1	1
