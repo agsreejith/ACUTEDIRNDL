@@ -135,7 +135,7 @@ functioon of wavelength is specified, then the code takes this instead of the co
 	
 3. EXAMPLES OF SOME INPUT FILES
 -------------------------------	
-Example for wavelength depended transit light curve
+Example for wavelength depended transit light curve (PS: the first element in the array ie A[0,0] is omitted.)
 
 0	2000	2010	2020	2030	2040	2050
 
