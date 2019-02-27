@@ -41,7 +41,7 @@ FeII_stark = -6.53
 
 ;===============================
 ;ISM fixed parameters
-ISM_b_Mg2=2.0        ;b-parameter for the Ca2 ISM lines in km/s
+ISM_b_Mg2=3.0        ;b-parameter for the ISM lines in km/s
 vr_ISM=0.          ;radial velocity of the ISM absorption lines in km/s
 
 ;===============================
