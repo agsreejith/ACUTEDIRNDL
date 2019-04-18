@@ -83,9 +83,15 @@ bin=w_length/16
 
 
 t=fix(t_star)
-phonex_file=l_file+'\lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+CASE StrUpCase(!Version.OS_Family) OF
+  'WINDOWS': phonex_file=l_file+'\lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+  'UNIX': phonex_file=l_file+'/lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+ENDCASE
 if file_test( phonex_file) ne 1 then t = t+100
-phonex_file=l_file+'\lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+CASE StrUpCase(!Version.OS_Family) OF
+  'WINDOWS': phonex_file=l_file+'\lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+  'UNIX': phonex_file=l_file+'/lte'+String(t, Format='(I05)')+'-4.50-0.0.PHOENIX-ACES-AGSS-COND-SPECINT-2011.fits'
+ENDCASE
 mu=mrdfits(phonex_file,1,head)
 flux_all=mrdfits(phonex_file,0,head)
 ;print,head

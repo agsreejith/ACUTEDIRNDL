@@ -70,9 +70,9 @@ FUNCTION RemoveRows, array, rows
 END
 
 
-pro cutedrndl
+pro cutedrndl,parameter_file
 
-;for qwerty=4,29 do begin
+;for qwerty=5,13 do begin
 ;
 ;  #Configuration file for the data simulator
 ;  #provided here for easy reference
@@ -171,7 +171,11 @@ close,/all
 
 
 ;Reading from configuration file
-infile=gm_read_textstructure("cutedrndl_parameters_hd209.txt");edit the configuration information above and comment this line to run without parameter file.
+if file_test(parameter_file) eq 0 then begin
+  message,'Parameter file not found'
+endif
+idl_ver=float(!Version.RELEASE)
+infile=gm_read_textstructure(parameter_file);edit the configuration information above and comment this line to run without parameter file.
 file=infile.input_file
 t_star=double(infile.stellar_temperature)
 r_star=double(infile.stellar_radius)
@@ -208,8 +212,9 @@ r_noise=r_noise_in
 s_wid=infile.slit_width
 s_len=infile.slit_length
 pl_scale=double(infile.plate_scale)
+;if (tag_exist(infile,'sys_type') eq 1) then sys_type=infile.sys_type
+;file_out='D:\simulator_output\iwf\uv\5000\'+String(qwerty, Format='(I02)')+'\'
 
-;file_out='output\hd209\bz\orbit'+String(qwerty, Format='(I02)')+'\'
 ;slit position check
 if (abs(s_pos) gt double(s_len/120)) then begin
   print,'Slit position outside slit, Readjust the parameters and run again'
@@ -226,6 +231,10 @@ ccd_wave=dblarr(nx)
 openr,1,file_wave
 readf,1,wavelength
 close,1
+if infile.wave_shift eq 1 then begin
+  
+  
+endif
 
 ;if resolution determine the the wavelength and number of pixels in x
 if (infile.developer_mode eq 1) then begin
@@ -247,7 +256,7 @@ wave=reform(wave,n_elements(wave))
 writecol,file_out+'photon_input.txt',wave,photons_star,fmt='(2(F17.9,1x))
 ;stop
 ;jitter test, creates a gaussian of specified sigma value to check the effect of jitter 
-;jitter_flux=make_array(n_elements(photons_star),value=1)
+;jitter_flux=make_array(n_elements(photons_star),value=0)
 ;gauss_flux=gaussian(wave,[1000,2900,0.0213])
 ;st=where(wave eq 2850)
 ;en=where(wave eq 2950)
@@ -256,7 +265,7 @@ writecol,file_out+'photon_input.txt',wave,photons_star,fmt='(2(F17.9,1x))
 ;jitter_print=jitter_flux[st:en]
 ;photons_star=jitter_flux
 ;writecol,file_out+'jitter_input.txt',wave_print,jitter_print,fmt='(2(F17.9,1x))
-
+;stop
 
 st=value_locate(wave, 2000)
 en=value_locate(wave, 7000)
@@ -324,16 +333,19 @@ aeff=interpol(eff_area[4,*],eff_area[0,*],wave_res,/SPLINE); linear interpolatio
 
 ccd_count1=dblarr(nx/2) 
 ;Effective area/QE
+;for jitter test
+;ccd_flux=ccd_flux/exptime
 ccd_count1=ccd_flux*aeff*fwhm ;comment *aeff*fwhm during jitter test
 plot,wave_res,ccd_count1
 writecol,file_out+'cute_counts.txt',wave_res,ccd_count1*300.
 ;write_png,file_out+'cute_count.png',TVRD(/TRUE)
 ccd_count=dblarr(nx)
-
+;stop
 for i=0,nx-1 do begin
  ccd_count[i]=ccd_count1[i/2]/2
  ;print,ccd_count1[i/2],ccd_count[i]
 endfor
+;stop
 ;for jitter
 ;ccd_count=ccd_flux
 ;writecol,file_out+'jitter_cute.txt',wavelength,ccd_count,fmt='(2(F17.9,1x))
@@ -369,13 +381,14 @@ for k=0,4 do begin
   bias= reform(new_bias,[nx,ny])
   ;bias=cute_random(nx,ny,r_noise,b_value)
   ;stop
-  sxaddpar, bihdr, 'Time_in_JD', t
-  sxaddpar, bihdr, 'Readout_noise', r_noise
-  sxaddpar, bihdr, 'Bias_value', b_value
-  sxaddpar, bihdr, 'Mean', mean(bias)
-  sxaddpar, bihdr, 'Median ', median(bias)
-  sxaddpar, bihdr, 'Max_value', max(bias)
-  sxaddpar, bihdr, 'Min_Value', min(bias)
+  sxaddpar, bihdr, 'OBS_TIME', t,FORMAT='F17.7', 'Time of observation'
+  sxaddpar, bihdr, 'Rt_noise', r_noise,'Read out noise of observation'
+  sxaddpar, bihdr, 'B_value', b_value,'Threshold bias value applied'
+  sxaddpar, bihdr, 'Mean', mean(bias),'Mean value of the frame'
+  sxaddpar, bihdr, 'Median ', median(bias),'Median value of the frame'
+  sxaddpar, bihdr, 'Max', max(bias),'Maximum value of the frame'
+  sxaddpar, bihdr, 'Min', min(bias),'Minimum value of the frame' 
+  sxaddpar, bihdr, 'FILETYPE', 'BIAS','Type of observation'
   bias=bias*G
   ;write the fits file
   mwrfits,bias,file_out+'bias'+String(k, Format='(I05)') +'.fits',bihdr,/create
@@ -413,17 +426,17 @@ for k=0,4 do begin
   dark=dark*G
   dark2=dark2*G
   ;writing dark header
-  sxaddpar, dhdr, 'Time_in_JD', t
-  sxaddpar, dhdr, 'Input_dark_value', dark_value
-  sxaddpar, dhdr, 'Mean', mean(dark)
-  sxaddpar, dhdr, 'Median ', median(dark)
-  sxaddpar, dhdr, 'Max_value', max(dark)
-  sxaddpar, dhdr, 'Min_Value', min(dark)
-  sxaddpar, dhdr, 'Exposure_Time_in_seconds', exptime
-  
+  sxaddpar, dhdr, 'OBS_TIME', t,FORMAT='F17.7', 'Time of observation'
+  sxaddpar, dhdr, 'dark_val', dark_value,'Input dark value'
+  sxaddpar, dhdr, 'Mean', mean(dark),'Average value of frame'
+  sxaddpar, dhdr, 'Median ', median(dark),'Median value of frame'
+  sxaddpar, dhdr, 'Max', max(dark),'Maximum value of frame'
+  sxaddpar, dhdr, 'Min', min(dark),'Minimum value of frame'
+  sxaddpar, dhdr, 'Exp_Time', exptime,'Exposure time'
+  sxaddpar, dhdr, 'FILETYPE', 'DARK','Type of observation'
   ;write the fits file
   mwrfits,dark,file_out+'dark'+String(k, Format='(I05)') +'.fits',dhdr,/create
-  mwrfits,dark2,file_out+'dark_wcosmic'+String(k, Format='(I05)') +'.fits',dhdr,/create
+  ;mwrfits,dark2,file_out+'dark_wcosmic'+String(k, Format='(I05)') +'.fits',dhdr,/create
   t_dark=t_dark+dark
 endfor
 dark_n=dark
@@ -431,7 +444,7 @@ dark_n=dark
 dark=(t_dark/5.)
 
 ;creating background frame
-backg=cute_background(wavelength=wavelength,token=key, file_bg=file_bg, file_sol=file_sol, file_zod=file_zod)
+backg=cute_background(wavelength=wavelength,token=key, file_bg=file_bg, file_sol=file_sol, file_zod=file_zod,jd=t,ra=ra, dec=dec)
 
 if(key eq 'default') then token='Default: From STIS backgrounds'
 if(key eq'calc') then token= 'Calculated from Zodiacla data'
@@ -444,18 +457,19 @@ background=dblarr(nx,ny)
 for k=0,ny-1 do begin
   background(*,k)=scaled_spectrum
 endfor
-background=background*exptime
+background=background*exptime;*2;simple scatter check
 ;background header
-sxaddpar, bhdr, 'Time_in_JD', t
+sxaddpar, bhdr, 'Time_in_JD', t,FORMAT='F17.7', 'Time of observation'
 sxaddpar, bhdr, 'RA_of_target', ra
 sxaddpar, bhdr, 'Dec_of_target', dec
 sxaddpar, bhdr, 'Julian_date', jd
 sxaddpar, bhdr, 'Type_of_background', token
 sxaddpar, bhdr, 'Spectral_resolution', fwhm
 sxaddpar, bhdr, 'Exposure_Time_in_seconds', exptime
+sxaddpar, bhdr, 'FILETYPE', 'BCKG'
 ;write the fits file
-mwrfits,background,file_out+'background.fits',bhdr,/create
-
+;mwrfits,background,file_out+'background.fits',bhdr,/create
+;stop
 ; checking for background stars and calculating background stars
 im_bs=dblarr(nx,ny)
 if infile.stars eq 1 then im_bs=background_star(infile)
@@ -503,13 +517,14 @@ for k=0,4 do begin
   flat=flat*G
   flat2=flat2*G
   ;write the fits file
-  sxaddpar, fhdr, 'Time_in_JD', t
-  sxaddpar, fhdr, 'Mean', mean(flat)
-  sxaddpar, fhdr, 'Median ', median(flat)
-  sxaddpar, fhdr, 'Max_value', max(flat)
-  sxaddpar, fhdr, 'Min_Value', min(flat)
+  sxaddpar, fhdr, 'OBS_TIME', t,FORMAT='F17.7', 'Time of observation'
+  sxaddpar, fhdr, 'Mean', mean(flat),'Average value of frame'
+  sxaddpar, fhdr, 'Median ', median(flat),'Median value of frame'
+  sxaddpar, fhdr, 'Max', max(flat),'Maximum value of frame'
+  sxaddpar, fhdr, 'Min', min(flat),'Minimum value of frame'
+  sxaddpar, fhdr, 'FILETYPE', 'FLAT','Type of observation'
   mwrfits,flat,file_out+'flat'+String(k, Format='(I05)') +'.fits',fhdr,/create
-  mwrfits,flat2,file_out+'flat_wcosmic'+String(k, Format='(I05)') +'.fits',fhdr,/create
+  ;mwrfits,flat2,file_out+'flat_wcosmic'+String(k, Format='(I05)') +'.fits',fhdr,/create
   t_flat=t_flat+flat
 endfor  
 ;average flat
@@ -524,21 +539,20 @@ endif else begin  ;reading the planet transmission spectrum from file
   transit_len=file_lines(infile.transit)
   ; Determine the number of rows in the file.
   rows = file_lines(file)
-  ; Determine the number of colums in the file by reading
+    ; Determine the number of colums in the file by reading
   ; the first line and parsing it into column units.
   openr, lun, file, /Get_Lun
   line = ""
   readf, lun, line
   ; Find the number of columns in the line.
   cols = n_elements(StrSplit(line, /RegEx, /Extract))
-  stop
   if cols eq 2 then begin ;if transit light curve is constant for all wavelengths
     data=dblarr(2,transit_len)
-    openr,11,infile.transit
+    openr,11,file
     readf,11,data
     close,11
     in_time=data[0,*];asuming time in seconds
-    scale1=data[1,*]
+    scale_value=data[1,*]
     ;scale=interpol(sacel1,in_wave,ccd_wave)
     obs_time=in_time[n_elements(in_time)-1]-in_time[1]
     rounding = obs_time mod (exptime+r_time)
@@ -551,15 +565,15 @@ endif else begin  ;reading the planet transmission spectrum from file
     new_time=dblarr((en/steps)-1)
     scale=dblarr(nx,(en/steps)-1)
     jj=0
-      for j=0, n_elements(scale[0,*])-1 do begin
-        ;print,jj,j,jj+exp_step
-        new_impct=scale1[jj:jj+exp_step]
-        scale[*,j]=mean(new_impct)
-        jj=jj+steps
-        new_time[j]=in_time[jj]
-        loc=where(scale_value eq min(scale_value))
-        mid_time=in_time[loc]
-      endfor
+    for j=0, n_elements(scale[0,*])-1 do begin
+      ;print,jj,j,jj+exp_step
+      new_impct=scale_value[jj:jj+exp_step]
+      scale[*,j]=mean(new_impct)
+      jj=jj+steps
+      new_time[j]=in_time[jj]
+      loc=where(scale_value eq min(scale_value))
+      mid_time=in_time[loc]
+    endfor
   endif else begin
     ; Create a variable to hold the data.
     data = dblarr(cols, rows)
@@ -568,41 +582,136 @@ endif else begin  ;reading the planet transmission spectrum from file
     ; Read the data.
     readf, lun, data
     free_lun, lun
-    in_wave=data[*,0]
-    in_time=data[0,*];asuming time in seconds
+    input_wave=data[*,0]
+    in_wave=input_wave[1:n_elements(input_wave)-1]
+    input_time=data[0,*];asuming time in seconds
+    in_time=input_time[1:n_elements(input_time)-1]
     scale_value=dblarr(cols-1,rows-1)
     scaling=dblarr(nx,rows-1)
-    for m=1, cols-1 do scale_value[m-1,*]=data[m,*]
-    for mn=1,rows-1 do scaling[*,mn-1]=interpol(scale_value[*,mn-1],in_wave,wavelength)
-    obs_time=in_time[n_elements(in_time)-1]-in_time[1]
+    for m=1, cols-1 do begin
+      for n=1, rows-1 do begin
+        scale_value[m-1,n-1]=data[m,n]
+      endfor
+    endfor
+    for mn=1,rows-1 do begin
+      smoothed_rad=gaussbroad(in_wave,scale_value[*,mn-1],hwhm)
+      scaling[*,mn-1]=interpol(smoothed_rad,in_wave,wavelength)
+    endfor
+    in_step=in_time[1]-in_time[0]
+    if (idl_ver ge 8.3) then in_step_time=dindgen(n_elements(in_time),INCREMENT=in_step) else begin
+      in_step_time=dblarr(n_elements(in_time))
+      for i=0,n_elements(in_time)-1 do begin
+        in_step_time[i]=i*in_step
+      endfor  
+    endelse
+    obs_time=in_step_time[n_elements(in_step_time)-1]-in_step_time[0]
     rounding = obs_time mod (exptime+r_time)
     reminder=exptime+r_time-rounding
     end_time = obs_time-rounding
-    steps=value_locate(in_time, exptime+r_time)
-    en= value_locate(in_time,end_time)
+    steps=value_locate(in_step_time, exptime+r_time)
+    en= value_locate(in_step_time,end_time)
     j=0
-    exp_step=value_locate(in_time,exptime)
+    exp_step=value_locate(in_step_time,exptime)
     new_time=dblarr((en/steps)-1)
     scale=dblarr(nx,(en/steps)-1)
     for k=0,nx-1 do begin
-        jj=0
-        for j=0, n_elements(scale[0,*])-1 do begin
-           ;print,jj,j,jj+exp_step
-            new_impct=scaling[k,jj:jj+exp_step]
-            scale[k,j]=mean(new_impct)
-            jj=jj+steps
-            new_time[j]=in_time[jj]
-            loc=where(scale_value eq min(scale_value))
-            mid_time=in_time[loc]  
-        endfor
+      jj=0
+      for j=0, n_elements(scale[0,*])-1 do begin
+        ;print,jj,j,jj+exp_step
+        new_impct=scaling[k,jj:jj+exp_step]
+        scale[k,j]=mean(new_impct)
+        ;new_impct_time=scaling[k,jj:jj+exp_step]
+        new_time[j]=in_time[jj]
+        jj=jj+steps
+        mid_time=0
+      endfor
     endfor
-  ;scale=interpol(sacel1,in_wave,ccd_wave) 
+    time=dblarr(n_elements(in_time))
+    if (tag_exist(infile,'transit_mid_time') eq 1)then begin
+      ;loc=where(x eq 0)
+      Tmid=double(infile.transit_mid_time)
+      new_time=(new_time/86400.0)+Tmid
+      mid_time=Tmid
+    endif
+    ;scale=interpol(sacel1,in_wave,ccd_wave)
   endelse
+ 
+;  stop
+;  if cols eq 2 then begin ;if transit light curve is constant for all wavelengths
+;    data=dblarr(2,transit_len)
+;    openr,11,infile.transit
+;    readf,11,data
+;    close,11
+;    in_time=data[0,*];asuming time in seconds
+;    scale1=data[1,*]
+;    ;scale=interpol(sacel1,in_wave,ccd_wave)
+;    obs_time=in_time[n_elements(in_time)-1]-in_time[1]
+;    rounding = obs_time mod (exptime+r_time)
+;    reminder=exptime+r_time-rounding
+;    end_time = obs_time-rounding
+;    steps=value_locate(in_time, exptime+r_time)
+;    en= value_locate(in_time,end_time)
+;    j=0
+;    exp_step=value_locate(in_time,exptime)
+;    new_time=dblarr((en/steps)-1)
+;    scale=dblarr(nx,(en/steps)-1)
+;    jj=0
+;      for j=0, n_elements(scale[0,*])-1 do begin
+;        ;print,jj,j,jj+exp_step
+;        new_impct=scale1[jj:jj+exp_step]
+;        scale[*,j]=mean(new_impct)
+;        jj=jj+steps
+;        new_time[j]=in_time[jj]
+;        loc=where(scale_value eq min(scale_value))
+;        mid_time=in_time[loc]
+;      endfor
+;  endif else begin
+;    ; Create a variable to hold the data.
+;    data = dblarr(cols, rows)
+;    ; Rewind the data file to its start.
+;    point_lun, lun, 0
+;    ; Read the data.
+;    readf, lun, data
+;    free_lun, lun
+;    in_wave=data[*,0]
+;    in_time=data[0,*];asuming time in seconds
+;    scale_value=dblarr(cols-1,rows-1)
+;    scaling=dblarr(nx,rows-1)
+;    for m=1, cols-1 do scale_value[m-1,*]=data[m,*]
+;    for mn=1,rows-1 do scaling[*,mn-1]=interpol(scale_value[*,mn-1],in_wave,wavelength)
+;    obs_time=in_time[n_elements(in_time)-1]-in_time[1]
+;    rounding = obs_time mod (exptime+r_time)
+;    reminder=exptime+r_time-rounding
+;    end_time = obs_time-rounding
+;    steps=value_locate(in_time, exptime+r_time)
+;    en= value_locate(in_time,end_time)
+;    j=0
+;    exp_step=value_locate(in_time,exptime)
+;    new_time=dblarr((en/steps)-1)
+;    scale=dblarr(nx,(en/steps)-1)
+;    for k=0,nx-1 do begin
+;        jj=0
+;        for j=0, n_elements(scale[0,*])-1 do begin
+;           ;print,jj,j,jj+exp_step
+;            new_impct=scaling[k,jj:jj+exp_step]
+;            scale[k,j]=mean(new_impct)
+;            jj=jj+steps
+;            new_time[j]=in_time[jj]
+;            loc=where(scale_value eq min(scale_value))
+;            mid_time=in_time[loc]  
+;        endfor
+;    endfor
+;  ;scale=interpol(sacel1,in_wave,ccd_wave) 
+;  endelse
 endelse  
-m_t=mid_time/86400.0
-Tmid=t+m_t[0]
-
-if (tag_exist(infile,'transit_mid_time') eq 1)then Tmid=double(mid_time)  
+;m_t=mid_time/86400.0
+;Tmid=t+m_t[0]
+;stop
+if (tag_exist(infile,'transit_mid_time') eq 0)then begin
+  m_t=mid_time/86400.0
+  Tmid=t+m_t[0]
+endif
+if (tag_exist(infile,'transit_mid_time') eq 1)then Tmid= double(mid_time)
 ;define header of image
 writecol,file_out+'input_light curve.txt',new_time,scale(0,*),fmt='(2(F17.7,1x))
 t0=t
@@ -630,6 +739,7 @@ if infile.sc_orbit_period eq 0 then new_scale=scale else begin
   near=dblarr(n_orbits)
   index=intarr(n_orbits)
   end_loc=intarr(n_orbits)
+
   for i=0,n_orbits-1 do begin
     gap_loc[i]= gap_loc1+orbit_period*i
     near[i] = Min(Abs(time_orbit - gap_loc[i]), ind)
@@ -651,8 +761,13 @@ if infile.sc_orbit_period eq 0 then new_scale=scale else begin
   upd_scale=dblarr(nx,new_length)
   upd_exptime=dblarr(new_length)
   for i=0,n_orbits-1 do begin
-    size=end_loc[i]-index[i]+1
-    array=make_array(size,start=index[i],/INDEX)
+    sizear=end_loc[i]-index[i]+1
+    if (idl_ver ge 8.3) then array=make_array(sizear,start=index[i],/INDEX) else begin
+      array=indgen(sizear)
+      for asd=0,sizear-1 do begin
+        array[asd]=index[i]+asd
+      endfor
+    endelse
     removables= [removables,array]
   endfor
   remove,0,removables
@@ -664,11 +779,57 @@ if infile.sc_orbit_period eq 0 then new_scale=scale else begin
   ;write_png,file_out+'occl.png',TVRD(/TRUE)
 endelse
 ;stop
-for k=0, n_elements(new_scale[0,*])-1 do begin ;
+;implementing wavelength shift
+scale_ele=n_elements(new_time)
+ccd_count_shift=dblarr(nx,scale_ele)
+wave_shift=dblarr(scale_ele)
+if infile.wave_shift eq 1 then begin
+  max_wshift= double(infile.max_wshift)
+  wavelength1=wavelength
+  for k=0,scale_ele-1 do begin
+    rand=fix(20*randomu(seed,1))
+    ran_val=rand[0]
+    for rd=0,ran_val do wshift_val=randomu(seed,1)*max_wshift+0
+    new_r=randomu(seed,1)
+    if new_r gt 0.5 then wshift_val=wshift_val
+    if new_r le 0.5 then wshift_val=-1*wshift_val
+    wave_res=dblarr(nx/2)
+    ;print,size(wavelength)
+    for i=0,nx-1 do wavelength1[i]=wavelength[i]+wshift_val[0]
+    wave_shift[k]=wshift_val
+    
+    for i=0,nx-2,2 do wave_res[i/2]=mean(wavelength1[i:i+1])
+
+    ;interpolate and trim to detector size
+    ;ccd_flux=interpol(smoothedflux,wave_new,wavelength,/SPLINE) ;for jitter
+    ccd_flux=interpol(smoothedflux,wave_new,wave_res,/SPLINE); linear interpolation
+    ccd_wave=wavelength
+    ;effective area and interpolate to cute wavelength
+    aeff=interpol(eff_area[4,*],eff_area[0,*],wave_res,/SPLINE); linear interpolation
+    ccd_count1=dblarr(nx/2)
+    ;Effective area/QE
+    ;for jitter test
+    ;ccd_flux=ccd_flux/exptime
+    ccd_count1=ccd_flux*aeff*fwhm ;comment *aeff*fwhm during jitter test
+    plot,wave_res,ccd_count1
+    writecol,file_out+'cute_counts_wshift'+string(k,Format='(I05)')+'.txt',wave_res,ccd_count1*300.
+    ;write_png,file_out+'cute_count.png',TVRD(/TRUE)
+    ccd_count=dblarr(nx)
+ 
+    for i=0,nx-1 do begin
+      ccd_count[i]=ccd_count1[i/2]/2
+      ;print,ccd_count1[i/2],ccd_count[i]
+    endfor
+    ccd_count_shift[*,k]=ccd_count
+  endfor
+endif else ccd_count_shift[*,k]=ccd_count
+
+for k=0, n_elements(new_scale[0,*])-1 do begin ;n_elements(new_scale[0,*])-1
 ;  inc=k*exptime/86400.0
 ;  t=t0+inc
   if (tag_exist(infile,'transit_mid_time') eq 1)then t=new_time[k] 
-  scaled_ccd_count=new_scale[*,k]*ccd_count
+  
+  scaled_ccd_count=new_scale[*,k]*ccd_count_shift[*,k]
   ;cute_orbit,
   
   ;if t-t0 
@@ -683,11 +844,20 @@ for k=0, n_elements(new_scale[0,*])-1 do begin ;
   delta_z=zjitter
   ;exptime=fix(exptime*expos_fact[k])
   if infile.jitter_sim eq 1 then im_j=jitter(im_t,delta_x,delta_y,delta_z,exptime,pl_scale) else if infile.jitter_sim eq 0 then im_j=im*exptime
-  im_jl=im_j ;if no linearity
+ 
+  if infile.systematics eq 1 then im_js=cute_systematics(infile,t,t0,im_j,infile.sys_type) else im_js=im_j ;adding cute systematics
+  cute_orbit_pr = 5400.
+  if infile.systematics eq 1 then if infile.sc_orbit_period ne 0 then cute_orbit_pr = double(infile.sc_orbit_period)*60
+  frac_orbit_time=(t-t0)*86400/cute_orbit_pr
+  im_jls=im_js ;if no linearity
   ;adding the effect of linearity
-  image_linearity,im_j,im_jl
+
+  if (tag_exist(infile,'linearity_file') eq 1) then begin
+    line_file=infile.linearity_file
+    image_linearity,im_js,im_jls,line_file
+  endif else image_linearity,im_js,im_jls
+  ;mwrfits,im_jl,file_out+'jitter_image_wtc'+String(k, Format='(I05)') +'.fits',hdr1,/create
   ;stop
-  if infile.systematics eq 1 then im_jls=cute_systematics(infile,t,t0,im_jl) else im_jls=im_jl ;adding cute systematics
   
   sxaddpar, hdr1, 'Time_in_JD', t
   sxaddpar, hdr1, 'Star_Tem', t_star
@@ -697,18 +867,28 @@ for k=0, n_elements(new_scale[0,*])-1 do begin ;
   sxaddpar, hdr1, 'Spectral_resolution', fwhm
   sxaddpar, hdr1, 'Exp_Time', exptime
   ;write the fits file
-  sxaddpar, hdr, 'obs_time', t,FORMAT='F17.7'
-  sxaddpar, hdr, 'Star_Temp', t_star
-  sxaddpar, hdr, 'Star_Rad', r_star
-  sxaddpar, hdr, 'Magnitude', M_star
-  sxaddpar, hdr, 'Slit_Pos', s_pos
-  sxaddpar, hdr, 'Spectral', fwhm
-  sxaddpar, hdr, 'Exp_Time', exptime
-  sxaddpar, hdr, 'mid_time', Tmid[0],FORMAT='F17.7'
- 
-
-  
- ;mwrfits,im_wtc,file_out+'image_wtc'+String(k, Format='(I05)') +'.fits',hdr1,/create
+   sxaddpar, hdr, 'Date', jd,'Date of frame creation in JD'
+  sxaddpar, hdr, 'obs_time', t,FORMAT='F17.7', 'Time of observation'
+  sxaddpar, hdr, 'Star_Tem', t_star,'Stellar temperature'
+  sxaddpar, hdr, 'Star_Rad', r_star,'Stellar radius'
+  sxaddpar, hdr, 'STAR_Mag', M_star,'Stellar magnitude'
+  sxaddpar, hdr, 'RA_trg', ra,'Right ascension'
+  sxaddpar, hdr, 'Dec_trg', dec,'Declination'
+  sxaddpar, hdr, 'Type_of_background', token,'Type of background'
+  sxaddpar, hdr, 'Slit_Pos', s_pos,'Position of star on slit wrt slit center'
+  sxaddpar, hdr, 'Spec_res', fwhm, 'Spectral resolution'
+  sxaddpar, hdr, 'Rt_noise', r_noise,'Read out noise of observation'
+  sxaddpar, hdr, 'Exp_Time', exptime,'Exposure time'
+  sxaddpar, hdr, 'mid_time', Tmid[0],FORMAT='F17.7','Mid transit time of observation'
+  sxaddpar, hdr, 'FILETYPE', 'OBJECT','Type of observation'
+  sxaddpar, hdr, 'TARGNAME', 'TEST','Target name of observation'
+  sxaddpar, hdr, 'YCUT1', 0,'Bottom of science box extraction'
+  sxaddpar, hdr, 'YCUT2', ny-1,'Top of science box extraction'
+  sxaddpar, hdr, 'WAVESHFT', wave_shift[k],'Wavelength shift in Angstroms'
+  sxaddpar, hdr, 'IDLVER', idl_ver,'Version of IDL used to produce the frame'
+  sxaddpar, hdr, 'ORBPRD', cute_orbit_pr,'Orbit period of satellite'
+  sxaddpar, hdr, 'FRAORB', frac_orbit_time,'Time as a fraction of orbital period' 
+ mwrfits,im_wtc,file_out+'image_wtc'+String(k, Format='(I05)') +'.fits',hdr,/create
 ;bias, flat and dark check
 ;  im_wtc_num=im_wtc+bias_num 
 ;  mwrfits,im_wtc_num,file_out+'image_wtc_bias'+String(k, Format='(I05)') +'.fits',hdr1,/create
@@ -775,7 +955,7 @@ for k=0, n_elements(new_scale[0,*])-1 do begin ;
 
 endfor
 im_bs=im_bs*G*exptime
-  mwrfits,im_bs,file_out+'background_star.fits',hdr,/create
+  ;mwrfits,im_bs,file_out+'background_star.fits',hdr,/create
 t2=systime(/SECONDS)  
   print,'Exitng the simulator'
   openw,12,'cutedrndl_log_at_'+String(k, Format='(I05)') +'.txt'
@@ -794,4 +974,5 @@ print,'Time taken by simulator in seconds:',t2-t1
 ;udefine all variable
 ;delvar,bias,dark,flat,im,im_j,im_jl,im_jln,im_n,im_nb,im_nbfbd,im_final,t,k,st,en,ccd_count
 ;endfor
+logprint,close=close
 end

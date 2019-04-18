@@ -56,10 +56,16 @@ close,/all
     lca_strct={magnitude:V_mag,radius:r_star,temperature:t_star,Ra:ra,Dec:dec,stype:sptype,BV:bv,logr:strct.logr,param:strct.stellar_params}
     r_star=double(r_star)
     t=fix(t_star)
-    
-    file=in_file+'\models\t'+String(t, Format='(I05)') +'g4.4\model.flx' ;assuming folder named by their temperature and file are named as model.flx
+    file_out=strct.file_out
+    CASE StrUpCase(!Version.OS_Family) OF
+      'WINDOWS': file=in_file+'\models\t'+String(t, Format='(I05)') +'g4.4\model.flx' ;assuming folder named by their temperature and file are named as model.flx ;WINDOWS
+      'UNIX': file=in_file+'/models/t'+String(t, Format='(I05)') +'g4.4/model.flx' ;assuming folder named by their temperature and file are named as model.flx; UNIX.
+    ENDCASE
     if file_test(file) ne 1 then t = t+100 ;above 8000K the steps is 200K
-    file=in_file+'\models\t'+String(t, Format='(I05)') +'g4.4\model.flx' ;test again to see if temperature is not in range or is in steps of 100 or 200
+    CASE StrUpCase(!Version.OS_Family) OF
+      'WINDOWS': file=in_file+'\models\t'+String(t, Format='(I05)') +'g4.4\model.flx' ;test again to see if temperature is not in range or is in steps of 100 or 200 ;WINDOWS
+      'UNIX': file=in_file+'/models/t'+String(t, Format='(I05)') +'g4.4/model.flx' ;test again to see if temperature is not in range or is in steps of 100 or 200 UNIX.
+    ENDCASE
     if file_test(file) ne 1 then message,'Invalid input in stellar temperature, Please input temperature between 3500K and 10000K in steps of 100'
     length=file_lines(file)
     fdata=dblarr(3,length)
@@ -213,10 +219,10 @@ close,/all
     photons_star=flux_n*5.03e7*wave ;from ergs/s/cm2/A to photons/s/cm2/A
     photons[0,*]=wave
     photons[1,*]=photons_star
-    cgplot,wave,flux_e,xrange=[2500,3300],color=cgcolor('black')
+    cgplot,wave,flux_e,xrange=[2500,3500],color=cgcolor('black')
     ;stop
-    cgoplot,wave,flux_n,xrange=[2500,3300],color=cgcolor('red')
-    write_png,'flux_at_earth_'+String(t, Format='(I05)') +'.png',TVRD(/TRUE)
+    cgoplot,wave,flux_n,xrange=[2500,3500],color=cgcolor('red')
+    write_png,file_out+'flux_at_earth_'+String(t, Format='(I05)') +'.png',TVRD(/TRUE)
     ;stop
     return,photons
   

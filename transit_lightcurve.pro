@@ -24,7 +24,8 @@
 pro transit_lightcurve,infile,scale,new_time,Tmid
 close,/all
 nx      = long(infile.x_pixels)
-
+if (tag_exist(infile,'spectral_resolution') eq 1) then fwhm=float(infile.spectral_resolution)
+s_pos=double(infile.slit_position)
 file_wave=infile.wave_file
 w_length=file_lines(file_wave)
 wavelength=dblarr(w_length)
@@ -73,7 +74,54 @@ a       = a*R_sun*R_star
   openr,1,planet_file
   readf,1,data
   close,1
-  pl=interpol(data[1,*],data[0,*],wavelength)
+  wave_new=data[0,*]
+  radius_new=data[1,*]
+  photons_star_new=radius_new
+  if (tag_exist(infile,'dispersion_file') eq 1) then begin
+    ;if the spectrograph has non linear dispersion then
+    dis_len=file_lines(infile.dispesrsion_file);contains wavelength and FWHM info
+    openr,1,infile.dispesrsion_file
+    readf,1,dispersion_data
+    close,1
+    wave_disp=dispersion_data[0,*]
+    fwhm_disp=dispersion_data[1,*]
+    fwhm=interpol(fwhm_disp,wave_disp,wave_new)
+    ;wavelength resolution of CUTE
+    if (s_pos ge -2 && s_pos le 2) then fwhm=fwhm
+    if (s_pos gt 2 && s_pos le 8) then fwhm=fwhm*3/2
+    if (s_pos gt 8) then fwhm=fwhm*2
+    if (s_pos lt -2 && s_pos ge -8) then fwhm=fwhm*3/2
+    if s_pos lt -8 then fwhm=fwhm*2
+
+    hwhm=fwhm/2
+    f_flux=dblarr(n_elements(wave_new))
+    for i=0,n_elements(wave_new)-1 do begin
+      wave_s=dblarr(n_elements(wave_new))
+      flux_s=dblarr(n_elements(photons_star_new))
+      wave_s=wave_new
+      flux_s[i]=photons_star_new[i]
+      gauss_flux=gaussbroad(wave_s,flux_s,hwhm[i])
+      f_flux+=gauss_flux
+    endfor
+    smoothedflux=f_flux
+  endif else begin ;linear dispersion value set by spectral resolution
+    ;wavelength resolution of CUTE
+    if (s_pos ge -2 && s_pos le 2) then fwhm=fwhm
+    if (s_pos gt 2 && s_pos le 8) then fwhm=fwhm*3/2
+    if (s_pos gt 8) then fwhm=fwhm*2
+    if (s_pos lt -2 && s_pos ge -8) then fwhm=fwhm*3/2
+    if s_pos lt -8 then fwhm=fwhm*2
+    hwhm=fwhm/2
+
+    st1=value_locate(wave_new, 2518.50)
+    en1=value_locate(wave_new, 3331.10)
+
+    ;convolution with instrument response
+    smoothedflux=gaussbroad(wave_new,photons_star_new,hwhm)
+    ;smoothedflux = gaussfold(wave, photons_star, fwhm, LAMMIN=2518.50, LAMMAX=3331.10)
+  endelse
+  smoothedflux=radius_new
+  pl=interpol(smoothedflux,wave_new,wavelength)
   R_pl    = mean(pl)*R_sun*R_star
  endif else begin
   p = double(infile.planet_radius)
@@ -121,21 +169,20 @@ print,'Transit_duration:',t_dur
         scale[k,j]=mean(new_impct)
         jj=jj+steps
         new_time[j]=time[jj]
-        loc=where(x eq 0)
-        Tmid=time[loc]
        endfor
     endfor 
-if (tag_exist(infile,'transit_mid_time') eq 1)then begin
-  
-  loc=where(x eq 0)
-  Tmid=double(infile.transit_mid_time)
-  for i=0L,30000 do time[30000-i]=Tmid-i*step
-  for i=1L,30000 do time[30000+i]=Tmid+i*step
-  j=0
-  for i=0L,(n_elements(scale[0,*])-1)*steps,steps do begin
-    new_time[j]=time[i]
-    j++
-  endfor
-endif
-stop
+    loc=where(x eq 0)
+    Tmid=time[loc]
+ if (tag_exist(infile,'transit_mid_time') eq 1)then begin
+    loc=where(x eq 0)
+    Tmid=double(infile.transit_mid_time)
+    for i=0L,30000 do time[30000-i]=Tmid-i*step
+    for i=1L,30000 do time[30000+i]=Tmid+i*step
+    j=0
+    for i=0L,(n_elements(scale[0,*])-1)*steps,steps do begin
+      new_time[j]=time[i]
+      j++
+    endfor
+ endif
+;stop
 end

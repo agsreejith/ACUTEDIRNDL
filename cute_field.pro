@@ -53,7 +53,7 @@ nq_dec=s_dec(req2)
 ;clr = Byte(Round(cgScaleVector(clr, 0, 255)))
 ;cgLoadCT, 33
 ;cgWindow
-cgDisplay, 1400,1400
+cgDisplay, 2800,2800
 ;!p.position=[0.15,0.15,0.99,0.99]
 m=max(v_mag)
 mi=min(v_mag)
@@ -101,5 +101,6 @@ cgLegend, Title=['V:'+dia], PSym=[9], SymSize=[size_val], Color=['black'], Locat
 
 file_var=fix(rot_ang)
 write_png,file_out+'cute_field_'+String(file_var, Format='(I03)')+'.png',TVRD(/TRUE)
-stop
+
+;stop
 end
