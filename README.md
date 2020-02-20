@@ -20,11 +20,11 @@ gaussbroad.pro
 gm_read_textstructure.pro
 gm_read_textfile.pro
 cmset_op.pro
-get_tags.pro
-keyword_defined.pro
+writecol.pro
 mpfitfun
+exofast
 
-All required codes not present in the IDL astronomy library are provided in the library folder.
+All required codes not mentioned above are provided in the library folder.
 
 Add the simulation folder (and sub-folders) to the IDL source in the startup file.
 
@@ -34,6 +34,7 @@ This software is governed by an input parameter file called: cutedrndl_parameter
 
 The ACUTEDIRNDL routines are available in the src folder. Run cutedrndl.pro (just type cutedrndl inside 
 the IDL environment) after editing the parameter file.
+e.g. cutedrndl,'location of parameter file'
 The outputs will be stored in the folder specified in input parameter file. The number of output files will 
 depend on both transit duration and exposure time per observation. Note that the simulator overwrites the 
 files in the output directory. The detailed description of the parameters in the input parameter file is described here below.
@@ -47,8 +48,7 @@ thus directing the simulator to the location of the file.
 The stellar parameters required as input to the the simulator are 1) the stellar temperature (from 3500 to 
 10000K, in steps of 100K); 2) the stellar radius (in unit of solar radii); 3) and Johnson V-band stellar_magnitude. 
 It is also necessary to provide the location (i.e., path) of the files containing the stellar model fluxes 
-that are provided together with the simulator. These files contain the model fluxes where the first column 
-is the wavelength in Angstrom, the second column is the stellar flux in erg cm^-2 s^-1 Hz^-1, and the third 
+that are provided together with the simulator (contact developers for these models). These files contain the model fluxes where the first column is the wavelength in Angstrom, the second column is the stellar flux in erg cm^-2 s^-1 Hz^-1, and the third 
 column is the stellar continuum in erg cm^-2 s^-1 Hz^-1. Note that the stellar continuum is used for the 
 inclusion of line core emission and interstellar medium absorption.
 
@@ -90,8 +90,7 @@ The background parameters set how the background is calculated and whether to in
  respective position inside the slit.
 
 - General stellar data (This input is required)
-The stellar_params file, located in the "extra" directory, gives the main stellar parameters as a finction 
-of spectral type. The first column is the spectral type, the second column is the stellar effective 
+The stellar_params file, located in the "extra" directory (contact developers for CUTE specific extra directory), gives the main stellar parameters as a finction of spectral type. The first column is the spectral type, the second column is the stellar effective 
 temperature, the third column is the B-V color, while the fourth column is the stellar radius in solar radii
 . The user needs to specify also the full path of this file.
 
@@ -111,12 +110,24 @@ also the full path of these files.
 - CCD parameters (This input is required)
 These parameters specify the characteristics of the CCD. X_ and Y_pixels indicate the x and y pixel size of
  the CCD. The other parameters are the readout noise, in ADU, the dark level, in e/pixel/s , the average bia
- s level, in ADU, the readout time, in seconds [LUCA: SECONDS?], and the CCD gain, in photoelectrons per ADU . 
+ s level, in ADU, the readout time, in seconds, and the CCD gain, in photoelectrons per ADU . 
 
 - Spacecraft parameters (This input is required)
 The jitter_sim parameter sets whether spacecraft jitter has to be included or not (1 or 0, respectively). 
 The jitter parameter sets the rms amount of spacecraft jitter in arcseconds. The rotation parameter indicates
-the position angle (rotation with respect to the RA axis) of the slit, in degrees.
+the position angle (rotation with respect to the RA axis) of the slit, in degrees. Jitter drift parameters set
+jitter drift wrt time. set jitter_drfit to one to include the effect.
+
+-Occultation parameters
+Orbit period of the satellite and earth shadow time. Not required if systematics (discussed below are not to be included)
+
+-Sytematics parameters
+Parameters required to model the variation of spectrum flux with time. It has the form sm=sym_p1*t^3+sym_p2*t^2+sym_p3*t+sym_p4. 
+Set systematics to 1 to simulate thhis effect.
+
+-Wavelength shift parameters
+These parameters are required to simulate any wavelength shift in the data. Set wave_shift to 1 to simulate the effects
+Wavelength shift can also be achived with appropriate jitter shift parameter. 
 	
 - Transit parameters (This input is required)
 The impact parameter of the transit is between 0 and 1, where 0 corresponds to central transit.
@@ -131,6 +142,9 @@ planetary radius will not depend on wavelength, or as a file containing waveleng
 planetary radius as a function of wavelength (second column). Also in this case, the planetary radius as a 
 function of wavelength has to be set in units of stellar radii. If the file with planetary radius as a 
 functioon of wavelength is specified, then the code takes this instead of the constant radius.
+
+-Global non linearity parameters
+Parameters requierd to produce spacecraft orbit independed systematics
 
 	
 3. EXAMPLES OF SOME INPUT FILES
