@@ -118,14 +118,14 @@ The jitter parameter sets the rms amount of spacecraft jitter in arcseconds. The
 the position angle (rotation with respect to the RA axis) of the slit, in degrees. Jitter drift parameters set
 jitter drift wrt time. set jitter_drfit to one to include the effect.
 
--Occultation parameters
-Orbit period of the satellite and earth shadow time. Not required if systematics (discussed below are not to be included)
+- Occultation parameters
+Orbit period of the satellite and earth shadow time. Not required if systematics (discussed below are not to be included). Set orbit period to 0 when not in use.
 
--Sytematics parameters
+- Sytematics parameters
 Parameters required to model the variation of spectrum flux with time. It has the form sm=sym_p1*t^3+sym_p2*t^2+sym_p3*t+sym_p4. 
 Set systematics to 1 to simulate thhis effect.
 
--Wavelength shift parameters
+- Wavelength shift parameters
 These parameters are required to simulate any wavelength shift in the data. Set wave_shift to 1 to simulate the effects
 Wavelength shift can also be achived with appropriate jitter shift parameter. 
 	
@@ -143,7 +143,7 @@ planetary radius as a function of wavelength (second column). Also in this case,
 function of wavelength has to be set in units of stellar radii. If the file with planetary radius as a 
 functioon of wavelength is specified, then the code takes this instead of the constant radius.
 
--Global non linearity parameters
+- Global non linearity parameters
 Parameters requierd to produce spacecraft orbit independed systematics
 
 	
