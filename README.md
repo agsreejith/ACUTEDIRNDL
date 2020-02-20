@@ -15,14 +15,14 @@ http://en.wikipedia.org/wiki/FITS
 1. PRE-REQUISITIES
 ------------------
 
-IDL astro packages.
-gaussbroad.pro
-gm_read_textstructure.pro
-gm_read_textfile.pro
-cmset_op.pro
-writecol.pro
-mpfitfun
-exofast
+IDL astro packages, 
+gaussbroad.pro, 
+gm_read_textstructure.pro, 
+gm_read_textfile.pro, 
+cmset_op.pro, 
+writecol.pro, 
+mpfitfun, 
+exofast, 
 
 All required codes not mentioned above are provided in the library folder.
 
