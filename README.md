@@ -22,7 +22,8 @@ gm_read_textfile.pro,
 cmset_op.pro, 
 writecol.pro, 
 mpfitfun, 
-exofast, 
+exofast,
+idl coyote graphics library (mostly for some plots),
 
 All required codes not mentioned above are provided in the library folder.
 
