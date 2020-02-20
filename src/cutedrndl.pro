@@ -936,7 +936,7 @@ if (tag_exist(infile,'transit_mid_time') eq 0)then begin
 endif
 if (tag_exist(infile,'transit_mid_time') eq 1)then Tmid= double(mid_time)
 ;define header of image
-writecol,file_out+'input_light curve.txt',new_time,scale(0,*),fmt='(2(F17.7,1x))
+writecol,file_out+'input_light_curve.txt',new_time,scale(0,*),fmt='(2(F17.7,1x))
 t0=t
 if (tag_exist(infile,'transit_mid_time') eq 1)then t0=new_time[0] 
 
@@ -1008,16 +1008,23 @@ endelse
 scale_ele=n_elements(new_time)
 ccd_count_shift=dblarr(nx,scale_ele)
 wave_shift=dblarr(scale_ele)
-if infile.wave_shift eq 1 then begin
-  max_wshift= double(infile.max_wshift)
+if ((infile.wave_shift eq 1) or (infile.jitter_drift eq 1)) then begin
   wavelength1=wavelength
+  if infile.wave_shift eq 1 then max_wshift= double(infile.max_wshift)
   for k=0,scale_ele-1 do begin
-    rand=fix(20*randomu(seed,1))
-    ran_val=rand[0]
-    for rd=0,ran_val do wshift_val=randomu(seed,1)*max_wshift+0
-    new_r=randomu(seed,1)
-    if new_r gt 0.5 then wshift_val=wshift_val
-    if new_r le 0.5 then wshift_val=-1*wshift_val
+    if infile.wave_shift eq 1 then begin
+      rand=fix(20*randomu(seed,1))
+      ran_val=rand[0]
+      for rd=0,ran_val do wshift_val=randomu(seed,1)*max_wshift+0
+      new_r=randomu(seed,1)
+      if new_r gt 0.5 then wshift_val=wshift_val
+      if new_r le 0.5 then wshift_val=-1*wshift_val
+    endif 
+    if  infile.jitter_drift eq 1 then begin
+      tp=(t-t0)*86400
+      wshift_val=fix(((jx_p1*tp^3+jx_p2*tp^2+jx_p3*tp+jx_p4)/pl_scale)*hwhm)
+    endif
+    if (tag_exist(infile,'transit_mid_time') eq 1)then t=new_time[k]   
     wave_res=dblarr(nx/2)
     ;print,size(wavelength)
     for i=0,nx-1 do wavelength1[i]=wavelength[i]+wshift_val[0]
@@ -1080,7 +1087,8 @@ for k=0, n_elements(new_scale[0,*])-1 do begin ;n_elements(new_scale[0,*])-1
    
   ;if t-t0 
   ;defien position on detector
-  if (infile.jitter_drift eq 1) then yshift=fix(jy_p1*t^3+jy_p2*t^2+jy_p3*t+jy_p4)+yshift  
+  tp=(t-t0)*86400
+  if (infile.jitter_drift eq 1) then yshift=fix(((jy_p1*tp^3+jy_p2*tp^2+jy_p3*tp+jy_p4)+yshift)/pl_scale)  
   im=cute_specspread(file_pos,file_spread,scaled_ccd_count,nx,ny,s_pos,0,yshift,pl_scale)
   ;mwrfits,im,file_out+'1sec_image_wtc'+String(k, Format='(I05)') +'.fits',hdr1,/create
   im_wtc=im*exptime*G
