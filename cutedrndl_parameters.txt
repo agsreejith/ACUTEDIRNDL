@@ -1,126 +1,171 @@
 #Configuration file for the data simulator
-#Please note: comments and empty lines have to start with '#' 
+#Please note: comments and empty lines have to start with '#'
 #
-#Location of stellar flux at earth file, if comented out the flux at earth will be calculated 
+#Location of stellar flux at earth file, if comented out the flux at earth will be calculated
 #based on stellar parameters below
-#flux_file			= ''
+#flux_file      = ''
 #Stellar Parameters
-#The parameters for the input star: Temperature in K, Radius in solar radii and V-Magnitude  
+#The parameters for the input star: Temperature in K, Radius in solar radii and V-Magnitude
 #
-stellar_temperature	= 6800
-stellar_radius		= 1.732
-stellar_magnitude	= 8.54
-logR				= -4.950 
-#mg_col				= 10
+stellar_temperature  = 
+stellar_radius       = 
+stellar_magnitude    = 
+stellar_distance     = 
+
+logR                 = 
+#mg_col              = 
 #
 #Location of stellar input flux files
-input_file			= 'D:\cutedrndl\'
+input_file           = 
 #
-#Observing Parameters, RA and Dec in degrees, exposure time (exptime) in seconds, set JD to 0 for system time else specify JD
-Ra					= 78.2955
-Dec					= 33.31829
-JD					= 2458190.9433248
-exptime				= 300		
+#Observing Parameters, RA and Dec in degrees, exposure time (exptime) in seconds, 
+#set JD to 0 for system time else specify JD
+Ra                   = 
+Dec                  = 
+JD                   = 
+exptime              = 
 #
-#Instrument Parameters : 
+#Instrument Parameters :
 #Position of the star in slit : in arc minutes
 #Spectral resolution of the spectrograph in Å.
 #Plate scale at the detector in arcseconds per pixel
 #
-slit_position		= 0
-spectral_resolution	= 0.8 
-plate_scale			= 2.5
+slit_position        = 0
+spectral_resolution  = 0.8
+plate_scale          = 2.5
 #
 #Wavelength file location for CUTE
-wave_file			= 'extra\wavelength.txt'
+wave_file            = 'extra\wavelength.txt'
 #
 #Effective area file location for CUTE
-file_eff			= 'extra\eff_area.txt'
+file_eff             = 'extra\eff_area.txt'
 #
 #Spectrum parameter file location for CUTE
 #Specifies the position on the detector, the slope and y intercept of the the spectrum.
-#Default file has 3*3 array with each row corresponding to the corresponding position on the slit from center(0)
+#Default file has 3*3 array with each row corresponding to the corresponding position on the slit
+#from center(0)
 #
-file_pos			= 'extra\position.txt'
+file_pos             = 'extra\position.txt'
 #Specify the file containing information regarding spread of the spectrum in cross dispersion axis
 #
-file_spread			= 'extra\xdisp_inter_mod.txt'
+file_spread          = 'extra\xdisp_inter_mod.txt'
 #
 #Background information
-#Select type of background: Options default or calc, 
-#default: STIS high background values. calc: Calculated from zodiacal light data 
-#Include stars, to include stars chose 1 else 0. Select the maximum number of 
+#Select type of background: Options default or calc,
+#default: STIS high background values. calc: Calculated from zodiacal light data
+#Include stars, to include stars chose 1 else 0. Select the maximum number of
 #cosmic ray hits per observation with 'cosmic'
-type_bckg			= 'calc'
-stars				= 1 
-cosmic				= 5
+type_bckg            = 'calc'
+stars                = 1 
+cosmic               = 5
 #
-#scatter_parameters
-scatter				= 0
-scatter_in			= 1 # input flux over FOV in photons/s/cm2/sr
-scatter_fov			= 100 #fov of the instrument for scatter
-scatter_reduction	= 1e-10#reduction in scatter due to absorption	
+#scatter_parameters: Assuming a uniform distribution of scatter
+scatter              = 0
+#Input flux over FOV in photons/s/cm2/sr
+scatter_in           = 1 
+#fov of the instrument for scatter
+scatter_fov          = 100 
+#reduction in scatter due to absorption 
+scatter_reduction    = 1e-10 
 #
 #file location for stellar parameters for different stellar type
-stellar_params		= 'extra\stellar_param.txt'	
+stellar_params       = 'extra\stellar_param.txt'
+#
 #file locations for background calculation
-bckg_default		= 'extra\background.txt'
+bckg_default         = 'extra\background.txt'
 #
 #file locations for zodiacal calculation: solar spectrum and zodiacal distribution
-file_sol			= 'extra\zod_spectrum.txt'
-file_zod  			= 'extra\zod_dist.txt'
+file_sol           = 'extra\zod_spectrum.txt'
+file_zod           = 'extra\zod_dist.txt'
 #
 #CCD parameters
-#for 1sec, change values for coresponding exposure time 
-#Readout noise in e/pixel, readout time in sec 
-readout_noise		= 12.25
-bias_value			= 100
-dark_value			= 0.012
-ccd_gain			= 2
-x_pixels			= 2048
-y_pixels			= 515
-read_time			= 100	
+#for 1sec, change values for coresponding exposure time
+#Readout noise in e/pixel, readout time in sec
+readout_noise      = 12.25
+bias_value         = 100
+dark_value         = 0.012
+ccd_gain           = 1
+x_pixels           = 2048
+y_pixels           = 512
+read_time          = 20
 #
 #Slit parameters
 #specfied in arcseconds
-slit_width			= 40
-slit_length			= 1200
+slit_width         = 40
+slit_length        = 1200
 #Output location
-file_out			= 'output\' 
+file_out           = ''
 #
 #Spacecraft parameters
 #To include effect of jitter in the simulator  chose 1 for jitter_sim and 0 to skip jitter
 #Jitter of spacecraft RMS value, Rotation wrt to RA axis
-jitter_in_x			= 7.2
-jitter_in_y			= 7.2
-jitter_in_z			= 7.2
-rotation			= 115
-jitter_sim			= 1
-#
+jitter_sim         = 0
+jitter_in_x        = 7.2
+jitter_in_y        = 7.2
+jitter_in_z        = 7.2
+rotation           = 115
+#Jitter drift
+#It has the form j_p1*t^3+j_p2*t^2+j_p3*t+j_p4
+jitter_drift       = 0
+jx_p1              = 
+jx_p2              =
+jx_p3              =
+jx_p4              =
+jy_p1              =
+jy_p2              =
+jy_p3              =
+jy_p4              =
+jz_p1              =
+jz_p2              =
+jz_p3              =
+jz_p4              =
 #Occultation parameters
-sc_orbit_period 	= 0
-ocl_time			= 0
+sc_orbit_period    = 0
+ocl_time           = 
+#
 #Sytematics parameters
-systematics	= 0
-sym_p1		= 0
-sym_p2		= 0
-sym_p3		= 0
-sym_p4		= 0
+# It has the form sm=sym_p1*t^3+sym_p2*t^2+sym_p3*t+sym_p4
+systematics        = 0
+sym_p1             = 0
+sym_p2             = 0
+sym_p3             = 0
+sym_p4             = 0
+# Wavelength shift parameters
+#Set wave_shift to 1 to simulate the effects
+#max_wshift in A will specify the maximum shift in wavelength. 
+#Can now be set with appropriate jitter shift parameter as well. 
+#
+wave_shift         = 0
+max_wshift         = 0
+#
 #Transit parameters
-#Orbital period is in days, inclination in degrees, semi major axis as a function of stellar 
-#radius and mid transit time(if not provided calculated from JD) 
-limb_file			= 'D:\cutedrndl\limb_darkening\phoenix'
-impact_parameter	= 0.42
-orbital_period		= 3.52474859
-orbital_inclination	= 86.64
-rlt_semi_major_axis	= 8.7947
-#transit_mid_time	= 5817.70461
+#Orbital period is in days, inclination in degrees, semi major axis as a function of stellar
+#radius and mid transit time(if not provided calculated from JD)
+limb_file           = 'D:\cutedrndl\limb_darkening\phoenix'
+impact_parameter    = 0.597
+orbital_period      = 2.73477
+orbital_inclination = 83.76
+rlt_semi_major_axis = 5.242860538
+transit_mid_time    = 2456355.229
 #
 #Either provide planet radius as one number of the location of the file containing variation of
-#planet radius (ratio of planet radius to stellar radius) with wavelength in CUTE band.	
-planet_radius		= 0.12156
-#planet_radius_file = 'extra\radius.txt'
-#transit= 'lightcurve.txt'
-developer_mode		= 0
-start_wave			= 2500
-#end_wave			= 4000
+#planet radius (ratio of planet radius to stellar radius) with wavelength in CUTE band.
+#
+planet_radius       = 0.0911
+#planet_radius_file = ''
+#If tranist is provided as an iput file, provide the location of the file below. 
+#Uncomment it as well
+#
+#transit= '\cute_transit.txt'
+#
+#Global non linearity parameters
+out_transit_modl  = 0
+tmod1             = 0
+tmod2             = 0
+tmod3             = 0
+tmod4             = 0
+#
+developer_mode    = 0
+start_wave      = 2500
+#end_wave       = 4000
+##################################################################################################
