@@ -70,10 +70,8 @@ END
 
 
 pro cutedrndl,parameter_file
-
-;for qwerty=5,13 do begin
-;
-;  #Configuration file for the data simulator
+;Format of configuration file is as follows
+;#Configuration file for the data simulator
 ;#Please note: comments and empty lines have to start with '#'
 ;#
 ;#Location of stellar flux at earth file, if comented out the flux at earth will be calculated
@@ -336,7 +334,6 @@ wave=photons[0,*]
 photons_star=reform(photons_star,n_elements(photons_star))
 wave=reform(wave,n_elements(wave))
 writecol,file_out+'photon_input.txt',wave,photons_star,fmt='(2(F17.9,1x))
-;stop
 ;jitter test, creates a gaussian of specified sigma value to check the effect of jitter 
 ;jitter_flux=make_array(n_elements(photons_star),value=0)
 ;gauss_flux=gaussian(wave,[1000,2900,0.0213])
