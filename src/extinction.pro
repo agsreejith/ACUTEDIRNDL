@@ -4,7 +4,7 @@ pro extinction,glong,glat,distance,av,ebv
 ;This program corresponds to the Axysimetric Model (Model A)
 ;If you have any difficulty, sugestion or comments, please contact:
 ;jacques@astro.iag.usp.br     or     amores@astro.iag.usp.br
-;You enter longitude, latitude and distance of a point in the Galaxy and get extinction
+;Enter longitude, latitude and distance of a point in the Galaxy and get extinction
 
 close,/all
 r0=7.5 ;adopted distance of the Galactic center
